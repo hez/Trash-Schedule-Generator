@@ -4,8 +4,9 @@ require 'rubygems'
 require 'fastercsv'
 require 'json'
 
-TRASH_FILE = 'schedule.csv'
-STAT_HOLIDAYS = 'stats.csv'
+TRASH_FILE = $*[0] || 'schedule.csv'
+STAT_HOLIDAYS = $*[1] || 'stats.csv'
+END_DATE = DateTime.strptime("2012-12-31", '%F')
 
 zone, first_day, has_greenbin = nil
 cur_date = nil
@@ -49,9 +50,10 @@ FasterCSV.foreach( TRASH_FILE ) do | row |
   garbage = !recycling
 
   zone = row[0]
-  while( cur_date < DateTime.strptime("2011-12-31", '%F') )
+  while( cur_date <= END_DATE )
     is_exception = exceptions.include?( cur_date )
     csv = "#{zone.inspect},#{cur_date.strftime( '%Y-%m-%d' ).inspect},\"#{'G' if garbage || is_exception}#{'R' if recycling}#{'B' if green_bin}\""
+#    puts csv
     json << { 'date' => cur_date, 'zone' => "cityofnanaimo-#{zone.downcase}", 'flags' => "#{'G' if garbage || is_exception}#{'R' if recycling}#{'C' if green_bin}" }
     cur_date = getNextPickupDate( cur_date )
     recycling = !recycling
