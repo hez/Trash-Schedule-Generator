@@ -61,4 +61,4 @@ FasterCSV.foreach( TRASH_FILE ) do | row |
   end
 end
 
-puts json.to_json
+puts ',', json.to_json
